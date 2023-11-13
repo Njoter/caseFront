@@ -1,0 +1,8 @@
+
+.text-field {
+    -fx-prompt-text-fill: derive(-fx-control-inner-background, -30%);
+}
+.text-area {
+    -fx-prompt-text-fill: derive(-fx-control-inner-background, -30%);
+    -fx-wrap-text: true;
+}
