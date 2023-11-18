@@ -18,17 +18,25 @@ import java.util.Optional;
 public class CaseDialogBox {
 
     private static Case newCase;
-    private static final TextArea beskrivelseArea = new TextArea();
-    private static final TextField kundeNavnField = new TextField();
-    private static final TextField tlfField = new TextField();
-    private static final TextField varenrField = new TextField();
-    private static final TextArea løsningArea = new TextArea();
-    private static final TextField ansattNavnField = new TextField();
+    private static TextArea beskrivelseArea = new TextArea();
+    private static TextField kundeNavnField = new TextField();
+    private static TextField tlfField = new TextField();
+    private static TextField varenrField = new TextField();
+    private static TextArea løsningArea = new TextArea();
+    private static TextField ansattNavnField = new TextField();
     private static Label notValidLabel = new Label("");
 
-    public static Case display() {
+    public static Case display(Case existingCase) {
 
-        newCase = null;
+        newCase = existingCase;
+        if (newCase != null) {
+            beskrivelseArea = new TextArea(newCase.getBeskrivelse());
+            kundeNavnField = new TextField(newCase.getNavn());
+            tlfField = new TextField(newCase.getTlf());
+            varenrField = new TextField(newCase.getVarenr());
+            løsningArea = new TextArea(newCase.getLøsning());
+            ansattNavnField = new TextField(newCase.getAnsattNavn());
+        }
 
         // Stage
         Stage window = new Stage();

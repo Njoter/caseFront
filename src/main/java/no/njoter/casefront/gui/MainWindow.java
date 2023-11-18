@@ -87,7 +87,7 @@ public class MainWindow extends BorderPane {
     private Button setCreateCaseBtn() {
         Button button = new Button("Lag ny case");
         button.setOnAction(e -> {
-            Case newCase = CaseDialogBox.display();
+            Case newCase = CaseDialogBox.display(null);
             if (newCase != null) {
                 caseBoxList.add(new CaseBox(newCase));
                 CaseWriter.writeToFile(newCase, FOLDER_PATH);
@@ -99,7 +99,14 @@ public class MainWindow extends BorderPane {
     private Button setEditCaseBtn() {
         Button button = new Button("Rediger case");
         button.setOnAction(e -> {
-
+            if (selectedCase != null) {
+                Case newCase = CaseDialogBox.display(selectedCase);
+                if (newCase != null) {
+                    deleteCase(selectedCase);
+                    caseBoxList.add(new CaseBox(newCase));
+                    CaseWriter.writeToFile(newCase, FOLDER_PATH);
+                }
+            }
         });
         return button;
     }
@@ -108,15 +115,19 @@ public class MainWindow extends BorderPane {
         Button button = new Button("Slett case");
         button.setOnAction(e -> {
             if (selectedCase != null) {
-                Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Er du sikker på at du vil slette case?");
-                Optional<ButtonType> result = alert.showAndWait();
-                if (result.isPresent() && result.get() == ButtonType.OK) {
-                    CaseWriter.deleteFile(selectedCase, FOLDER_PATH);
-                    removeCaseFromCaseBoxList(selectedCase);
-                }
+                deleteCase(selectedCase);
             }
         });
         return button;
+    }
+
+    private void deleteCase(Case existingCase) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Er du sikker på at du vil slette case?");
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            CaseWriter.deleteFile(selectedCase, FOLDER_PATH);
+            removeCaseFromCaseBoxList(selectedCase);
+        }
     }
 
     private HBox createTopLayout() {
