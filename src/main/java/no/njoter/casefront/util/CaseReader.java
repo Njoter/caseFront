@@ -80,15 +80,14 @@ public class CaseReader {
 
     private static Case setCaseFields(String[] fields) {
         LocalDateTime tidspunkt = LocalDateTime.parse(fields[6]);
-        Case newCase = new Case(
-                fields[0],
-                fields[1],
-                fields[2],
-                fields[3],
-                fields[4],
-                fields[5],
-                tidspunkt
-        );
+        Case newCase = new Case();
+        newCase.setBeskrivelse(fields[0]);
+        newCase.setNavn(fields[1]);
+        newCase.setTlf(fields[2]);
+        newCase.setVarenr(fields[3]);
+        newCase.setLøsning(fields[4]);
+        newCase.setAnsattNavn(fields[5]);
+        newCase.setTidspunkt(tidspunkt);
         return newCase;
     }
 }

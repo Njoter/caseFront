@@ -17,8 +17,7 @@ import no.njoter.casefront.util.CaseWriter;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.Optional;
+import java.util.*;
 
 public class MainWindow extends BorderPane {
 
@@ -63,7 +62,22 @@ public class MainWindow extends BorderPane {
     private ArrayList<Case> loadCasesFromFile() {
         ArrayList<Case> cases = new ArrayList<>();
         CaseReader.readFromFile(cases, FOLDER_PATH);
+        sortCasesByLocalDateTime(cases);
         return cases;
+    }
+
+    private void sortCasesByLocalDateTime(ArrayList<Case> cases) {
+        Comparator<Case> comparator = new Comparator<Case>() {
+            @Override
+            public int compare(Case o1, Case o2) {
+                if (o1.getTidspunkt().isBefore(o2.getTidspunkt())) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
+        };
+        Collections.sort(cases, comparator);
     }
 
     private void populateCaseBoxList(ArrayList<Case> cases) {
@@ -87,9 +101,10 @@ public class MainWindow extends BorderPane {
     private Button setCreateCaseBtn() {
         Button button = new Button("Lag ny case");
         button.setOnAction(e -> {
-            Case newCase = CaseDialogBox.display(null);
+            Case newCase = new Case();
+            newCase = CaseDialogBox.display(newCase);
             if (newCase != null) {
-                caseBoxList.add(new CaseBox(newCase));
+                caseBoxList.add(0, new CaseBox(newCase));
                 CaseWriter.writeToFile(newCase, FOLDER_PATH);
             }
         });
@@ -102,8 +117,6 @@ public class MainWindow extends BorderPane {
             if (selectedCase != null) {
                 Case newCase = CaseDialogBox.display(selectedCase);
                 if (newCase != null) {
-                    deleteCase(selectedCase);
-                    caseBoxList.add(new CaseBox(newCase));
                     CaseWriter.writeToFile(newCase, FOLDER_PATH);
                 }
             }

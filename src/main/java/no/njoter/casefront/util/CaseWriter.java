@@ -15,14 +15,16 @@ public class CaseWriter {
         try {
             String fileName = newCase.getTidspunkt().toString();
             file = new File(folderPath + fileName);
-            file.createNewFile();
+            if (!file.exists()) {
+                file.createNewFile();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         BufferedWriter writer = null;
         try {
-            writer = new BufferedWriter(new FileWriter(file));
+            writer = new BufferedWriter(new FileWriter(file, false));
             writer.write(newCase.getBeskrivelse() + ";");
             writer.write(newCase.getNavn() + ";");
             writer.write(newCase.getTlf() + ";");

@@ -17,68 +17,47 @@ import java.util.Optional;
 
 public class CaseDialogBox {
 
+    private static Case originalCase;
     private static Case newCase;
-    private static TextArea beskrivelseArea = new TextArea();
-    private static TextField kundeNavnField = new TextField();
-    private static TextField tlfField = new TextField();
-    private static TextField varenrField = new TextField();
-    private static TextArea løsningArea = new TextArea();
-    private static TextField ansattNavnField = new TextField();
-    private static Label notValidLabel = new Label("");
+    private static Label notValidLabel;
+    private static Stage window;
+    private static TextArea beskrivelseArea;
+    private static TextField kundeNavnField;
+    private static TextField tlfField;
+    private static TextField varenrField;
+    private static TextArea løsningArea;
+    private static TextField ansattNavnField;
 
-    public static Case display(Case existingCase) {
+    public static Case display(Case passedCase) {
 
-        newCase = existingCase;
-        if (newCase != null) {
-            beskrivelseArea = new TextArea(newCase.getBeskrivelse());
-            kundeNavnField = new TextField(newCase.getNavn());
-            tlfField = new TextField(newCase.getTlf());
-            varenrField = new TextField(newCase.getVarenr());
-            løsningArea = new TextArea(newCase.getLøsning());
-            ansattNavnField = new TextField(newCase.getAnsattNavn());
+        if (passedCase != null) {
+            originalCase = copyOriginalCase(passedCase);
         }
+        newCase = passedCase;
 
-        // Stage
-        Stage window = new Stage();
-        window.setTitle("Ny Case");
-        window.setWidth(800);
-        window.setHeight(600);
+        window = createWindow();
 
-        // Buttons
-        Button okBtn = new Button("ok");
-        Button avbrytBtn = new Button("Avbryt");
-        okBtn.setPrefWidth(100);
-        avbrytBtn.setPrefWidth(100);
+        beskrivelseArea = setBeskrivelseArea();
+        kundeNavnField = setKundenavnField();
+        tlfField = setTlfField();
+        varenrField = setVarenrField();
+        løsningArea = setLøsningArea();
+        ansattNavnField = setAnsattNavnField();
 
-        // Panes
-        VBox root = new VBox();
-        GridPane grid = createGrid();
-        HBox buttonPane = createButtonPane(okBtn, avbrytBtn);
-
-        // Settings
-        root.setPadding(new Insets(20));
-        root.setSpacing(20);
-        root.setAlignment(Pos.CENTER);
+        notValidLabel = new Label("");
         notValidLabel.setTextFill(Color.RED);
 
-        // Event handlers
-        okBtn.setOnAction(e -> {
-            if (validateFields()) {
-                setCaseFields();
-                clearFields();
-                window.close();
-            }
-        });
-        
-        avbrytBtn.setOnAction(e -> {
-            closeDialog(window);
-        });
+        Button okBtn = setOkBtn();
+        Button avbrytBtn = setAvbrytBtn();
+
+        VBox root = createRoot();
+        GridPane grid = createGrid();
+        HBox buttonPane = createButtonPane(okBtn, avbrytBtn);
 
         window.setOnCloseRequest(e -> {
             closeDialog(window);
         });
 
-        // Add children and set scene
         root.getChildren().addAll(grid, buttonPane, notValidLabel);
         Scene scene = new Scene(root);
         scene.getStylesheets().add("stylesheet.css");
@@ -87,70 +66,182 @@ public class CaseDialogBox {
         return newCase;
     }
 
+    private static Case copyOriginalCase(Case passedCase) {
+        Case originalCase = new Case();
+        originalCase.setBeskrivelse(passedCase.getBeskrivelse());
+        originalCase.setNavn(passedCase.getNavn());
+        originalCase.setTlf(passedCase.getTlf());
+        originalCase.setVarenr(passedCase.getVarenr());
+        originalCase.setLøsning(passedCase.getLøsning());
+        originalCase.setAnsattNavn(passedCase.getAnsattNavn());
+        return originalCase;
+    }
+
+    private static VBox createRoot() {
+        VBox vBox = new VBox();
+        vBox.setPadding(new Insets(20));
+        vBox.setSpacing(20);
+        vBox.setAlignment(Pos.CENTER);
+        return vBox;
+    }
+
+    private static Stage createWindow() {
+        Stage stage = new Stage();
+        stage.setTitle("Ny Case");
+        stage.setWidth(800);
+        stage.setHeight(600);
+
+        return stage;
+    }
+
+    private static TextArea setBeskrivelseArea() {
+        TextArea textArea = new TextArea();
+        textArea.setPromptText("* Beskrivelse: (Hva gjelder casen?)");
+        textArea.textProperty().bindBidirectional(newCase.beskrivelseProperty());
+        return textArea;
+    }
+
+    private static TextField setKundenavnField() {
+        TextField textField = new TextField();
+        textField.setPromptText("Kundens navn:");
+        textField.textProperty().bindBidirectional(newCase.navnProperty());
+        return textField;
+    }
+
+    private static TextField setTlfField() {
+        TextField textField = new TextField();
+        textField.setPromptText("tlf:");
+        textField.textProperty().bindBidirectional(newCase.tlfProperty());
+        return textField;
+    }
+
+    private static TextField setVarenrField() {
+        TextField textField = new TextField();
+        textField.setPromptText("Varenummer:");
+        textField.textProperty().bindBidirectional(newCase.varenrProperty());
+        return textField;
+    }
+
+    private static TextArea setLøsningArea() {
+        TextArea textArea = new TextArea();
+        textArea.setPromptText("Løsning: (Hva har kunden fått beskjed om?)");
+        textArea.textProperty().bindBidirectional(newCase.løsningProperty());
+        return textArea;
+    }
+
+    private static TextField setAnsattNavnField() {
+        TextField textField = new TextField();
+        textField.setPromptText("* Ansattes navn:");
+        textField.textProperty().bindBidirectional(newCase.ansattNavnProperty());
+        return textField;
+    }
+
+    private static Button setOkBtn() {
+        Button button = new Button("Ok");
+        button.setPrefWidth(100);
+
+        button.setOnAction(e -> {
+            if (validateFields()) {
+                removeSemiColons();
+                if (newCase.getTidspunkt() == null) {
+                    newCase.setTidspunkt(LocalDateTime.now());
+                }
+                newCase.setFullText();
+                window.close();
+            }
+        });
+        return button;
+    }
+
+    private static Button setAvbrytBtn() {
+        Button button = new Button("Avbryt");
+        button.setPrefWidth(100);
+
+        button.setOnAction(e -> {
+            closeDialog(window);
+        });
+        return button;
+    }
+
     private static void closeDialog(Stage window) {
         if (validateAvbryt()) {
-            clearFields();
+            if (newCase != null) {
+                setCaseFieldsToOriginalState();
+                newCase = null;
+            }
             window.close();
         } else {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
             alert.setContentText("Er du sikker på at du vil avbryte?\n" +
-                    "Informasjonen vil ikke bli lagret.");
+                    "Endringer vil ikke bli lagret.");
             Optional<ButtonType> result = alert.showAndWait();
             if (result.isPresent() && result.get() == ButtonType.OK) {
-                clearFields();
+                if (newCase != null) {
+                    setCaseFieldsToOriginalState();
+                    newCase = null;
+                }
                 window.close();
             }
         }
     }
 
-    private static void clearFields() {
-        ArrayList<TextInputControl> fieldsArray = populateFieldsArray();
-        for (TextInputControl field : fieldsArray) {
-            field.clear();
-        }
+    private static void setCaseFieldsToOriginalState() {
+        beskrivelseArea.setText(originalCase.getBeskrivelse());
+        kundeNavnField.setText(originalCase.getNavn());
+        tlfField.setText(originalCase.getTlf());
+        varenrField.setText(originalCase.getVarenr());
+        løsningArea.setText(originalCase.getLøsning());
+        ansattNavnField.setText(originalCase.getAnsattNavn());
     }
 
     private static boolean validateAvbryt() {
         ArrayList<TextInputControl> fieldsArray = populateFieldsArray();
         for (TextInputControl field : fieldsArray) {
-            if (!field.getText().isEmpty()) {
+            if (field.getText() != null) {
                 return false;
             }
         }
         return true;
     }
 
-    private static void setCaseFields() {
-        removeSemiColons();
-        newCase = new Case(
-                beskrivelseArea.getText(),
-                kundeNavnField.getText(),
-                tlfField.getText(),
-                varenrField.getText(),
-                løsningArea.getText(),
-                ansattNavnField.getText(),
-                LocalDateTime.now()
-        );
-    }
-
     private static void removeSemiColons() {
         // Semicolons need to be removed because they are the regex for splitting the string when
         // reading from file
-        beskrivelseArea.setText(beskrivelseArea.getText().replace(";", "."));
-        kundeNavnField.setText(kundeNavnField.getText().replace(";", "."));
-        tlfField.setText(tlfField.getText().replace(";", "."));
-        varenrField.setText(varenrField.getText().replace(";", "."));
-        løsningArea.setText(løsningArea.getText().replace(";", "."));
-        ansattNavnField.setText(ansattNavnField.getText().replace(";", "."));
+        if (beskrivelseArea.getText() != null) {
+            beskrivelseArea.setText(beskrivelseArea.getText().replace(";", "."));
+        }
+        if (kundeNavnField.getText() != null) {
+            kundeNavnField.setText(kundeNavnField.getText().replace(";", "."));
+        }
+        if (tlfField.getText() != null) {
+            tlfField.setText(tlfField.getText().replace(";", "."));
+        }
+        if (varenrField.getText() != null) {
+            varenrField.setText(varenrField.getText().replace(";", "."));
+        }
+        if (løsningArea.getText() != null) {
+            løsningArea.setText(løsningArea.getText().replace(";", "."));
+        }
+        if (ansattNavnField.getText() != null) {
+            ansattNavnField.setText(ansattNavnField.getText().replace(";", "."));
+        }
     }
 
     private static boolean validateFields() {
         boolean valid = true;
-        if (beskrivelseArea.getText().isEmpty()) {
+
+        if (beskrivelseArea.getText() == null) {
+            valid = false;
+        } else if (beskrivelseArea.getText().isEmpty()) {
+            valid = false;
+        }
+
+        if (ansattNavnField.getText() == null) {
             valid = false;
         } else if (ansattNavnField.getText().isEmpty()) {
             valid = false;
         }
+
         if (!valid) {
             notValidLabel.setText("Alle felt merket med * må fylles ut.");
         }
@@ -180,13 +271,6 @@ public class CaseDialogBox {
         GridPane grid = new GridPane();
         grid.setVgap(20);
         grid.setAlignment(Pos.CENTER);
-
-        beskrivelseArea.setPromptText("* Beskrivelse: (Hva gjelder casen?)");
-        kundeNavnField.setPromptText("Kundens navn:");
-        tlfField.setPromptText("tlf:");
-        varenrField.setPromptText("Varenummer:");
-        løsningArea.setPromptText("Løsning: (Hva har kunden fått beskjed om?)");
-        ansattNavnField.setPromptText("* Ansattes navn:");
 
         grid.add(beskrivelseArea, 0, 0);
         grid.add(kundeNavnField, 0, 1);

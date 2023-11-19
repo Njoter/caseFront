@@ -1,7 +1,6 @@
 package no.njoter.casefront;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import no.njoter.casefront.gui.MainWindow;

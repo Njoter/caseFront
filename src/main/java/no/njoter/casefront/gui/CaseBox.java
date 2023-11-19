@@ -5,6 +5,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import no.njoter.casefront.Case;
+import no.njoter.casefront.util.DateFormatter;
 
 public class CaseBox extends GridPane {
 
@@ -14,7 +15,7 @@ public class CaseBox extends GridPane {
 
         this.newCase = newCase;
 
-        Label tidspunkt = setTidspunktLabel();
+        Label tidspunkt = new Label(DateFormatter.ddmmyyyyFormat(newCase.getTidspunkt()));
         Label beskrivelse = new Label(newCase.getBeskrivelse());
         Label navnField = new Label("Kundens navn: " + newCase.getNavn());
         Label tlfField = new Label("tlf: " + newCase.getTlf());
@@ -33,36 +34,6 @@ public class CaseBox extends GridPane {
         this.add(beskrivelsePane, 0, 1);
         this.add(infoPane, 1, 1);
         this.setPrefHeight(100);
-    }
-
-    private Label setTidspunktLabel() {
-        String day = "" + newCase.getTidspunkt().getDayOfMonth();
-        String month = convertMonthValueToString(newCase.getTidspunkt().getMonthValue());
-        String year = "" + newCase.getTidspunkt().getYear();
-        String hour = "" + newCase.getTidspunkt().getHour();
-        String minute = "" + newCase.getTidspunkt().getMinute();
-        String seconds = "" + newCase.getTidspunkt().getSecond();
-        Label label = new Label(day + " " + month + " " + year + " - " + hour + ":" + minute + ":" + seconds);
-        return label;
-    }
-
-    private String convertMonthValueToString(int monthValue) {
-        String month = "";
-        switch (monthValue) {
-            case 1 -> month = "Jan";
-            case 2 -> month = "Feb";
-            case 3 -> month = "Mar";
-            case 4 -> month = "Apr";
-            case 5 -> month = "Mai";
-            case 6 -> month = "Jun";
-            case 7 -> month = "Jul";
-            case 8 -> month = "Aug";
-            case 9 -> month = "Sep";
-            case 10 -> month = "Okt";
-            case 11 -> month = "Nov";
-            case 12 -> month = "Des";
-        }
-        return month;
     }
 
     private StackPane createTidspunktPane(Label tidspunkt) {
