@@ -4,6 +4,9 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
 import no.njoter.casefront.Case;
 import no.njoter.casefront.util.DateFormatter;
 
@@ -15,63 +18,90 @@ public class CaseBox extends GridPane {
 
         this.newCase = newCase;
 
-        Label tidspunkt = new Label(DateFormatter.ddmmyyyyFormat(newCase.getTidspunkt()));
-        Label beskrivelse = new Label(newCase.getBeskrivelse());
-        Label navnField = new Label("Kundens navn: " + newCase.getNavn());
-        Label tlfField = new Label("tlf: " + newCase.getTlf());
-        Label varenrField = new Label("Varenr: " + newCase.getVarenr());
-        Label løsningField = new Label("Løsning: " + newCase.getLøsning());
-        Label ansattNavnField = new Label("Ansattes navn: " + newCase.getAnsattNavn());
+        TextFlow tidspunktFlow = createTidspunktFlow();
+        TextFlow beskrivelseFlow = createBeskrivelseFlow();
 
-        StackPane tidspunktPane = createTidspunktPane(tidspunkt);
-        StackPane beskrivelsePane = createBeskrivelsePane(beskrivelse);
-        VBox infoPane = createInfoPane(navnField, tlfField, varenrField, løsningField, ansattNavnField);
+        TextFlow navnFlow = new TextFlow();
+        TextFlow tlfFlow = new TextFlow();
+        TextFlow varenrFlow = new TextFlow();
+        TextFlow løsningFlow = new TextFlow();
+        TextFlow ansattNavnFlow = new TextFlow();
+        VBox infoPane = createInfoPane(navnFlow, tlfFlow, varenrFlow, løsningFlow, ansattNavnFlow);
+
+        setBorders(tidspunktFlow, beskrivelseFlow, navnFlow, tlfFlow, varenrFlow, løsningFlow);
 
         setColumnConstraints(50, 50);
-        this.setBorder(Styling.setRegularBorder(true, true, true, true));
+        this.setPrefWidth(100);
 
-        this.add(tidspunktPane, 0, 0, 2, 1);
-        this.add(beskrivelsePane, 0, 1);
+        this.add(tidspunktFlow, 0, 0, 2, 1);
+        this.add(beskrivelseFlow, 0, 1);
         this.add(infoPane, 1, 1);
         this.setPrefHeight(100);
     }
 
-    private StackPane createTidspunktPane(Label tidspunkt) {
-        StackPane stackPane = new StackPane();
-        stackPane.setAlignment(Pos.BASELINE_LEFT);
-        stackPane.setPadding(new Insets(5, 5, 5, 5));
-        stackPane.getChildren().add(tidspunkt);
-        return stackPane;
+    private void setBorders(
+            TextFlow tidspunktFlow, TextFlow beskrivelseFlow,
+            TextFlow navnFlow, TextFlow tlfFlow, TextFlow varenrFlow, TextFlow løsningFlow
+    ) {
+        this.setBorder(Styling.setRegularBorder(true, true, true, true));
+        tidspunktFlow.setBorder(Styling.setRegularBorder(false, false, true, false));
+        beskrivelseFlow.setBorder(Styling.setRegularBorder(false, true, false, false));
+        navnFlow.setBorder(Styling.setRegularBorder(false, false, true, false));
+        tlfFlow.setBorder(Styling.setRegularBorder(false, false, true, false));
+        varenrFlow.setBorder(Styling.setRegularBorder(false, false, true, false));
+        løsningFlow.setBorder(Styling.setRegularBorder(false, false, true, false));
     }
 
-    private StackPane createBeskrivelsePane(Label beskrivelse) {
-        beskrivelse.setWrapText(true);
-        StackPane stackPane = new StackPane();
-        beskrivelse.prefWidthProperty().bind(stackPane.widthProperty());
-        stackPane.setAlignment(Pos.TOP_LEFT);
-        stackPane.setBorder(Styling.setRegularBorder(true, true, false, false));
-        stackPane.setPadding(new Insets(5, 5, 5, 5));
-        stackPane.getChildren().add(beskrivelse);
-        return stackPane;
+    private TextFlow createTidspunktFlow() {
+        TextFlow textFlow = new TextFlow();
+        textFlow.setPadding(new Insets(5));
+        textFlow.setStyle("-fx-background-color: #8BBACA");
+        Text text = new Text(DateFormatter.ddmmyyyyFormat(newCase.getTidspunkt()));
+        text.setFill(Color.WHITE);
+        textFlow.getChildren().add(text);
+        return textFlow;
+    }
+
+    private TextFlow createBeskrivelseFlow() {
+        TextFlow textFlow = new TextFlow();
+        textFlow.setPadding(new Insets(5));
+        Text text = new Text();
+        text.textProperty().bind(newCase.beskrivelseProperty());
+        textFlow.getChildren().add(text);
+        return textFlow;
     }
 
     private VBox createInfoPane(
-            Label navnField, Label tlfField, Label varenrField, Label løsningField, Label ansattNavnField
+            TextFlow navnFlow, TextFlow tlfFlow, TextFlow varenrFlow, TextFlow løsningFlow, TextFlow ansattNavnFlow
     ) {
         VBox vBox = new VBox();
-        // Set Borders
-        navnField.setBorder(Styling.setRegularBorder(true, false, true, false));
-        tlfField.setBorder(Styling.setRegularBorder(false, false, true, false));
-        varenrField.setBorder(Styling.setRegularBorder(false, false, true, false));
-        løsningField.setBorder(Styling.setRegularBorder(false, false, true, false));
 
-        navnField.prefWidthProperty().bind(vBox.widthProperty());
-        tlfField.prefWidthProperty().bind(vBox.widthProperty());
-        varenrField.prefWidthProperty().bind(vBox.widthProperty());
-        løsningField.prefWidthProperty().bind(vBox.widthProperty());
-        ansattNavnField.prefWidthProperty().bind(vBox.widthProperty());
+        Text navnPrefix = new Text("Kundens navn: ");
+        Text tlfPrefix = new Text("Tlf: ");
+        Text varenrPrefix = new Text("Varenr: ");
+        Text løsningPrefix = new Text("Løsning: ");
+        Text ansattNavnPrefix = new Text("Ansattes navn: ");
+
+        Text navnBind = new Text();
+        Text tlfBind = new Text();
+        Text varenrBind = new Text();
+        Text løsningBind = new Text();
+        Text ansattNavnBind = new Text();
+
+        navnBind.textProperty().bind(newCase.navnProperty());
+        tlfBind.textProperty().bind(newCase.tlfProperty());
+        varenrBind.textProperty().bind(newCase.varenrProperty());
+        løsningBind.textProperty().bind(newCase.løsningProperty());
+        ansattNavnBind.textProperty().bind(newCase.ansattNavnProperty());
+
+        navnFlow.getChildren().addAll(navnPrefix, navnBind);
+        tlfFlow.getChildren().addAll(tlfPrefix, tlfBind);
+        varenrFlow.getChildren().addAll(varenrPrefix, varenrBind);
+        løsningFlow.getChildren().addAll(løsningPrefix, løsningBind);
+        ansattNavnFlow.getChildren().addAll(ansattNavnPrefix, ansattNavnBind);
+
         vBox.setPadding(new Insets(0, 5, 0, 5));
-        vBox.getChildren().addAll(navnField, tlfField, varenrField, løsningField, ansattNavnField);
+        vBox.getChildren().addAll(navnFlow, tlfFlow, varenrFlow, løsningFlow, ansattNavnFlow);
         return vBox;
     }
 

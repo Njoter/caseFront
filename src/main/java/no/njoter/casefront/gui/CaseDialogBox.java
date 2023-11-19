@@ -17,18 +17,20 @@ import java.util.Optional;
 
 public class CaseDialogBox {
 
-    private static Case originalCase;
-    private static Case newCase;
-    private static Label notValidLabel;
-    private static Stage window;
-    private static TextArea beskrivelseArea;
-    private static TextField kundeNavnField;
-    private static TextField tlfField;
-    private static TextField varenrField;
-    private static TextArea løsningArea;
-    private static TextField ansattNavnField;
+    private Case originalCase;
+    private Case newCase;
+    private Label notValidLabel;
+    private Stage window;
+    private TextArea beskrivelseArea;
+    private TextField kundeNavnField;
+    private TextField tlfField;
+    private TextField varenrField;
+    private TextArea løsningArea;
+    private TextField ansattNavnField;
 
-    public static Case display(Case passedCase) {
+    public CaseDialogBox() {}
+
+    public Case display(Case passedCase) {
 
         if (passedCase != null) {
             originalCase = copyOriginalCase(passedCase);
@@ -55,7 +57,7 @@ public class CaseDialogBox {
         HBox buttonPane = createButtonPane(okBtn, avbrytBtn);
 
         window.setOnCloseRequest(e -> {
-            closeDialog(window);
+            closeDialog();
         });
 
         root.getChildren().addAll(grid, buttonPane, notValidLabel);
@@ -66,7 +68,7 @@ public class CaseDialogBox {
         return newCase;
     }
 
-    private static Case copyOriginalCase(Case passedCase) {
+    private Case copyOriginalCase(Case passedCase) {
         Case originalCase = new Case();
         originalCase.setBeskrivelse(passedCase.getBeskrivelse());
         originalCase.setNavn(passedCase.getNavn());
@@ -77,7 +79,7 @@ public class CaseDialogBox {
         return originalCase;
     }
 
-    private static VBox createRoot() {
+    private VBox createRoot() {
         VBox vBox = new VBox();
         vBox.setPadding(new Insets(20));
         vBox.setSpacing(20);
@@ -85,7 +87,7 @@ public class CaseDialogBox {
         return vBox;
     }
 
-    private static Stage createWindow() {
+    private Stage createWindow() {
         Stage stage = new Stage();
         stage.setTitle("Ny Case");
         stage.setWidth(800);
@@ -94,49 +96,49 @@ public class CaseDialogBox {
         return stage;
     }
 
-    private static TextArea setBeskrivelseArea() {
+    private TextArea setBeskrivelseArea() {
         TextArea textArea = new TextArea();
         textArea.setPromptText("* Beskrivelse: (Hva gjelder casen?)");
         textArea.textProperty().bindBidirectional(newCase.beskrivelseProperty());
         return textArea;
     }
 
-    private static TextField setKundenavnField() {
+    private TextField setKundenavnField() {
         TextField textField = new TextField();
         textField.setPromptText("Kundens navn:");
         textField.textProperty().bindBidirectional(newCase.navnProperty());
         return textField;
     }
 
-    private static TextField setTlfField() {
+    private TextField setTlfField() {
         TextField textField = new TextField();
         textField.setPromptText("tlf:");
         textField.textProperty().bindBidirectional(newCase.tlfProperty());
         return textField;
     }
 
-    private static TextField setVarenrField() {
+    private TextField setVarenrField() {
         TextField textField = new TextField();
         textField.setPromptText("Varenummer:");
         textField.textProperty().bindBidirectional(newCase.varenrProperty());
         return textField;
     }
 
-    private static TextArea setLøsningArea() {
+    private TextArea setLøsningArea() {
         TextArea textArea = new TextArea();
         textArea.setPromptText("Løsning: (Hva har kunden fått beskjed om?)");
         textArea.textProperty().bindBidirectional(newCase.løsningProperty());
         return textArea;
     }
 
-    private static TextField setAnsattNavnField() {
+    private TextField setAnsattNavnField() {
         TextField textField = new TextField();
         textField.setPromptText("* Ansattes navn:");
         textField.textProperty().bindBidirectional(newCase.ansattNavnProperty());
         return textField;
     }
 
-    private static Button setOkBtn() {
+    private Button setOkBtn() {
         Button button = new Button("Ok");
         button.setPrefWidth(100);
 
@@ -153,17 +155,17 @@ public class CaseDialogBox {
         return button;
     }
 
-    private static Button setAvbrytBtn() {
+    private Button setAvbrytBtn() {
         Button button = new Button("Avbryt");
         button.setPrefWidth(100);
 
         button.setOnAction(e -> {
-            closeDialog(window);
+            closeDialog();
         });
         return button;
     }
 
-    private static void closeDialog(Stage window) {
+    public void closeDialog() {
         if (validateAvbryt()) {
             if (newCase != null) {
                 setCaseFieldsToOriginalState();
@@ -185,7 +187,7 @@ public class CaseDialogBox {
         }
     }
 
-    private static void setCaseFieldsToOriginalState() {
+    private void setCaseFieldsToOriginalState() {
         beskrivelseArea.setText(originalCase.getBeskrivelse());
         kundeNavnField.setText(originalCase.getNavn());
         tlfField.setText(originalCase.getTlf());
@@ -194,7 +196,7 @@ public class CaseDialogBox {
         ansattNavnField.setText(originalCase.getAnsattNavn());
     }
 
-    private static boolean validateAvbryt() {
+    private boolean validateAvbryt() {
         ArrayList<TextInputControl> fieldsArray = populateFieldsArray();
         for (TextInputControl field : fieldsArray) {
             if (field.getText() != null) {
@@ -204,7 +206,7 @@ public class CaseDialogBox {
         return true;
     }
 
-    private static void removeSemiColons() {
+    private void removeSemiColons() {
         // Semicolons need to be removed because they are the regex for splitting the string when
         // reading from file
         if (beskrivelseArea.getText() != null) {
@@ -227,7 +229,7 @@ public class CaseDialogBox {
         }
     }
 
-    private static boolean validateFields() {
+    private boolean validateFields() {
         boolean valid = true;
 
         if (beskrivelseArea.getText() == null) {
@@ -248,7 +250,7 @@ public class CaseDialogBox {
         return valid;
     }
 
-    private static ArrayList<TextInputControl> populateFieldsArray() {
+    private ArrayList<TextInputControl> populateFieldsArray() {
         ArrayList<TextInputControl> fieldsArray = new ArrayList<>();
         fieldsArray.add(beskrivelseArea);
         fieldsArray.add(kundeNavnField);
@@ -259,7 +261,7 @@ public class CaseDialogBox {
         return fieldsArray;
     }
 
-    private static HBox createButtonPane(Button okBtn, Button avbrytBtn) {
+    private HBox createButtonPane(Button okBtn, Button avbrytBtn) {
         HBox pane = new HBox();
         pane.setSpacing(20);
         pane.setAlignment(Pos.CENTER);
@@ -267,7 +269,7 @@ public class CaseDialogBox {
         return pane;
     }
 
-    private static GridPane createGrid() {
+    private GridPane createGrid() {
         GridPane grid = new GridPane();
         grid.setVgap(20);
         grid.setAlignment(Pos.CENTER);
@@ -280,5 +282,12 @@ public class CaseDialogBox {
         grid.add(ansattNavnField, 0, 5);
 
         return grid;
+    }
+
+    public boolean isRunning() {
+        if (window == null) {
+            return false;
+        }
+        return window.isShowing();
     }
 }

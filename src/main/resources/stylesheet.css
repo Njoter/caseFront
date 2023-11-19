@@ -1,8 +1,32 @@
 
+.root {
+    -fx-background-color: #F8F8F8;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+.button {
+    -fx-background-color: #153C89;
+    -fx-text-fill: white;
+}
+.button:hover {
+    -fx-background-color: #8BBACA;
+}
 .text-field {
     -fx-prompt-text-fill: derive(-fx-control-inner-background, -30%);
+    -fx-border-color: #8BBACA;
+    -fx-border-width: 2px;
+}
+.text-area {
+    -fx-border-color: #8BBACA;
+    -fx-border-width: 2px;
 }
 .text-area {
     -fx-prompt-text-fill: derive(-fx-control-inner-background, -30%);
     -fx-wrap-text: true;
+}
+.list-view {
+    -fx-selection-bar: #8BBACA;
+}
+.list-cell:empty {
+    -fx-background-color: white;
 }

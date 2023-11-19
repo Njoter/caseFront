@@ -1,7 +1,6 @@
 package no.njoter.casefront.util;
 
 import no.njoter.casefront.Case;
-import no.njoter.casefront.gui.MainWindow;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -11,6 +10,19 @@ import java.io.IOException;
 public class CaseWriter {
 
     public static void writeToFile(Case newCase, String folderPath) {
+        File file = openFile(newCase, folderPath);
+        write(file, newCase);
+    }
+
+    public static void deleteFile(Case newCase, String folderPath) {
+        String fileName = newCase.getTidspunkt().toString();
+        File file = new File(folderPath + fileName);
+        if (file.exists()) {
+            file.delete();
+        }
+    }
+
+    private static File openFile(Case newCase, String folderPath) {
         File file = null;
         try {
             String fileName = newCase.getTidspunkt().toString();
@@ -21,7 +33,10 @@ public class CaseWriter {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return file;
+    }
 
+    private static void write(File file, Case newCase) {
         BufferedWriter writer = null;
         try {
             writer = new BufferedWriter(new FileWriter(file, false));
@@ -31,7 +46,8 @@ public class CaseWriter {
             writer.write(newCase.getVarenr() + ";");
             writer.write(newCase.getLøsning() + ";");
             writer.write(newCase.getAnsattNavn() + ";");
-            writer.write(newCase.getTidspunkt().toString());
+            writer.write(newCase.getTidspunkt().toString() + ";");
+            writer.write(newCase.getFullText());
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -40,14 +56,6 @@ public class CaseWriter {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        }
-    }
-
-    public static void deleteFile(Case newCase, String folderPath) {
-        String fileName = newCase.getTidspunkt().toString();
-        File file = new File(folderPath + fileName);
-        if (file.exists()) {
-            file.delete();
         }
     }
 }

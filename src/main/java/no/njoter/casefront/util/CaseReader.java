@@ -88,6 +88,7 @@ public class CaseReader {
         newCase.setLøsning(fields[4]);
         newCase.setAnsattNavn(fields[5]);
         newCase.setTidspunkt(tidspunkt);
+        newCase.setFullText();
         return newCase;
     }
 }

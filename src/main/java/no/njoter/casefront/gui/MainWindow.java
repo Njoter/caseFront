@@ -28,13 +28,16 @@ public class MainWindow extends BorderPane {
     private ListView<CaseBox> listView;
     private SelectedCaseFlow caseTextFlow;
     private Case selectedCase;
+    private final int CUSTOM_BUTTON_WIDTH = 125;
+    private final int CUSTOM_BUTTON_HEIGHT = 50;
+    private final CaseDialogBox caseDialogBox = new CaseDialogBox();
 
     public MainWindow() {
 
         ArrayList<Case> cases = loadCasesFromFile();
         populateCaseBoxList(cases);
 
-        Button searchBtn = new Button("Søk");
+        //Button searchBtn = new Button("Søk");
         Button newCaseBtn = setCreateCaseBtn();
         Button editCaseBtn = setEditCaseBtn();
         Button deleteCaseBtn = setDeleteCaseBtn();
@@ -49,7 +52,7 @@ public class MainWindow extends BorderPane {
         ScrollPane selectedCasePane = createSelectedCasePane();
         HBox buttonsPane = createButtonsPane();
 
-        topLayout.getChildren().addAll(searchField, searchBtn);
+        topLayout.getChildren().addAll(searchField);
         buttonsPane.getChildren().addAll(editCaseBtn, deleteCaseBtn);
         centerLayout.add(caseList, 0, 0, 1, 2);
         centerLayout.add(selectedCasePane, 1, 0);
@@ -83,6 +86,7 @@ public class MainWindow extends BorderPane {
     private void populateCaseBoxList(ArrayList<Case> cases) {
         ArrayList<CaseBox> caseBoxes = new ArrayList<>();
         for (Case newCase : cases) {
+            new CaseBox(newCase);
             caseBoxes.add(new CaseBox(newCase));
         }
         caseBoxList = FXCollections.observableList(caseBoxes);
@@ -90,6 +94,7 @@ public class MainWindow extends BorderPane {
 
     private TextField createSearchField() {
         TextField textField = new TextField();
+        textField.setPromptText("Søk på hva som helst");
         textField.textProperty().addListener(observable -> {
             filteredList = new FilteredList<>(caseBoxList, i ->
                     i.getNewCase().getFullText().toLowerCase().contains(searchField.getText().toLowerCase()));
@@ -100,12 +105,15 @@ public class MainWindow extends BorderPane {
 
     private Button setCreateCaseBtn() {
         Button button = new Button("Lag ny case");
+        button.setPrefSize(CUSTOM_BUTTON_WIDTH, CUSTOM_BUTTON_HEIGHT);
         button.setOnAction(e -> {
-            Case newCase = new Case();
-            newCase = CaseDialogBox.display(newCase);
-            if (newCase != null) {
-                caseBoxList.add(0, new CaseBox(newCase));
-                CaseWriter.writeToFile(newCase, FOLDER_PATH);
+            if (!caseDialogBox.isRunning()) {
+                Case newCase = new Case();
+                newCase = caseDialogBox.display(newCase);
+                if (newCase != null) {
+                    caseBoxList.add(0, new CaseBox(newCase));
+                    CaseWriter.writeToFile(newCase, FOLDER_PATH);
+                }
             }
         });
         return button;
@@ -113,11 +121,14 @@ public class MainWindow extends BorderPane {
 
     private Button setEditCaseBtn() {
         Button button = new Button("Rediger case");
+        button.setPrefSize(CUSTOM_BUTTON_WIDTH, CUSTOM_BUTTON_HEIGHT);
         button.setOnAction(e -> {
-            if (selectedCase != null) {
-                Case newCase = CaseDialogBox.display(selectedCase);
-                if (newCase != null) {
-                    CaseWriter.writeToFile(newCase, FOLDER_PATH);
+            if (!caseDialogBox.isRunning()) {
+                if (selectedCase != null) {
+                    Case newCase = caseDialogBox.display(selectedCase);
+                    if (newCase != null) {
+                        CaseWriter.writeToFile(newCase, FOLDER_PATH);
+                    }
                 }
             }
         });
@@ -126,6 +137,7 @@ public class MainWindow extends BorderPane {
 
     private Button setDeleteCaseBtn() {
         Button button = new Button("Slett case");
+        button.setPrefSize(CUSTOM_BUTTON_WIDTH, CUSTOM_BUTTON_HEIGHT);
         button.setOnAction(e -> {
             if (selectedCase != null) {
                 deleteCase(selectedCase);
@@ -146,7 +158,7 @@ public class MainWindow extends BorderPane {
     private HBox createTopLayout() {
         HBox hBox = new HBox();
         hBox.setAlignment(Pos.CENTER);
-        hBox.setPadding(new Insets(10));
+        hBox.setPadding(new Insets(20));
         hBox.setSpacing(10);
         return hBox;
     }
@@ -190,10 +202,6 @@ public class MainWindow extends BorderPane {
         ScrollPane scrollPane = new ScrollPane();
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
-        GridPane.setHgrow(scrollPane, Priority.ALWAYS);
-        GridPane.setVgrow(scrollPane, Priority.ALWAYS);
-        scrollPane.setMaxWidth(Double.MAX_VALUE);
-        scrollPane.setMaxHeight(Double.MAX_VALUE);
         return scrollPane;
     }
 
@@ -205,6 +213,7 @@ public class MainWindow extends BorderPane {
         scrollPane.setMaxWidth(Double.MAX_VALUE);
         scrollPane.setMaxHeight(Double.MAX_VALUE);
         caseTextFlow = new SelectedCaseFlow();
+        scrollPane.setStyle("-fx-background: white");
         scrollPane.setContent(caseTextFlow);
         return scrollPane;
     }
@@ -229,7 +238,6 @@ public class MainWindow extends BorderPane {
         listView = new ListView<>();
         filteredList = new FilteredList<>(caseBoxList);
         listView.setItems(filteredList);
-        listView.setPrefWidth(Double.MAX_VALUE);
         scrollPane.setContent(listView);
 
         // Event handler
@@ -242,5 +250,9 @@ public class MainWindow extends BorderPane {
                 }
             }
         });
+    }
+
+    public CaseDialogBox getCaseDialogBox() {
+        return caseDialogBox;
     }
 }
