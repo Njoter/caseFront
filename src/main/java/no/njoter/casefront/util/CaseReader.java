@@ -21,7 +21,6 @@ public class CaseReader {
                 for (String file : files) {
                     Case newCase = createCase(file);
                     if (newCase != null) {
-                        System.out.println("Case was successfully made.");
                         caseArray.add(newCase);
                     } else {
                         System.out.println("Case was null.");

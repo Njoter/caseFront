@@ -4,6 +4,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -11,6 +13,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import no.njoter.casefront.Case;
 
+import java.security.Key;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Optional;
@@ -27,6 +30,8 @@ public class CaseDialogBox {
     private TextField varenrField;
     private TextArea løsningArea;
     private TextField ansattNavnField;
+    private Button okBtn;
+    private Button avbrytBtn;
 
     public CaseDialogBox() {}
 
@@ -49,8 +54,8 @@ public class CaseDialogBox {
         notValidLabel = new Label("");
         notValidLabel.setTextFill(Color.RED);
 
-        Button okBtn = setOkBtn();
-        Button avbrytBtn = setAvbrytBtn();
+        okBtn = setOkBtn();
+        avbrytBtn = setAvbrytBtn();
 
         VBox root = createRoot();
         GridPane grid = createGrid();
@@ -98,42 +103,40 @@ public class CaseDialogBox {
 
     private TextArea setBeskrivelseArea() {
         TextArea textArea = new TextArea();
-        textArea.setPromptText("* Beskrivelse: (Hva gjelder casen?)");
+        textArea.setPromptText("Hva gjelder casen?");
         textArea.textProperty().bindBidirectional(newCase.beskrivelseProperty());
+
         return textArea;
     }
 
     private TextField setKundenavnField() {
         TextField textField = new TextField();
-        textField.setPromptText("Kundens navn:");
         textField.textProperty().bindBidirectional(newCase.navnProperty());
         return textField;
     }
 
     private TextField setTlfField() {
         TextField textField = new TextField();
-        textField.setPromptText("tlf:");
         textField.textProperty().bindBidirectional(newCase.tlfProperty());
         return textField;
     }
 
     private TextField setVarenrField() {
         TextField textField = new TextField();
-        textField.setPromptText("Varenummer:");
         textField.textProperty().bindBidirectional(newCase.varenrProperty());
         return textField;
     }
 
     private TextArea setLøsningArea() {
         TextArea textArea = new TextArea();
-        textArea.setPromptText("Løsning: (Hva har kunden fått beskjed om?)");
+        textArea.setPromptText("Hva har kunden fått beskjed om?");
         textArea.textProperty().bindBidirectional(newCase.løsningProperty());
+
         return textArea;
     }
 
     private TextField setAnsattNavnField() {
         TextField textField = new TextField();
-        textField.setPromptText("* Ansattes navn:");
         textField.textProperty().bindBidirectional(newCase.ansattNavnProperty());
         return textField;
     }
@@ -272,14 +275,29 @@ public class CaseDialogBox {
     private GridPane createGrid() {
         GridPane grid = new GridPane();
         grid.setVgap(20);
+        grid.setHgap(10);
         grid.setAlignment(Pos.CENTER);
 
-        grid.add(beskrivelseArea, 0, 0);
-        grid.add(kundeNavnField, 0, 1);
-        grid.add(tlfField, 0, 2);
-        grid.add(varenrField, 0, 3);
-        grid.add(løsningArea, 0, 4);
-        grid.add(ansattNavnField, 0, 5);
+        Label beskrivelseLabel = new Label("* Beskrivelse:");
+        Label kundeNavnLabel = new Label("Kundens navn:");
+        Label tlfLabel = new Label("Tlf:");
+        Label varenrLabel = new Label("Varenummer:");
+        Label løsningLabel = new Label("Løsningsforslag:");
+        Label ansattNavnLabel = new Label("* Ansattes navn:");
+
+        grid.add(beskrivelseLabel,0, 0);
+        grid.add(kundeNavnLabel,0, 1);
+        grid.add(tlfLabel,0, 2);
+        grid.add(varenrLabel,0, 3);
+        grid.add(løsningLabel,0, 4);
+        grid.add(ansattNavnLabel,0, 5);
+
+        grid.add(beskrivelseArea, 1, 0);
+        grid.add(kundeNavnField, 1, 1);
+        grid.add(tlfField, 1, 2);
+        grid.add(varenrField, 1, 3);
+        grid.add(løsningArea, 1, 4);
+        grid.add(ansattNavnField, 1, 5);
 
         return grid;
     }

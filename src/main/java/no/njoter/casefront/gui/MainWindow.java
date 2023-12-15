@@ -17,6 +17,7 @@ import no.njoter.casefront.util.CaseWriter;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.time.LocalDate;
 import java.util.*;
 
 public class MainWindow extends BorderPane {
@@ -37,7 +38,6 @@ public class MainWindow extends BorderPane {
         ArrayList<Case> cases = loadCasesFromFile();
         populateCaseBoxList(cases);
 
-        //Button searchBtn = new Button("Søk");
         Button newCaseBtn = setCreateCaseBtn();
         Button editCaseBtn = setEditCaseBtn();
         Button deleteCaseBtn = setDeleteCaseBtn();
@@ -48,15 +48,17 @@ public class MainWindow extends BorderPane {
         VBox leftLayout = createLeftLayout(newCaseBtn);
         GridPane centerLayout = createCenterLayout();
         ScrollPane caseList = createCaseList();
-        setCaseListContent(caseList);
         ScrollPane selectedCasePane = createSelectedCasePane();
         HBox buttonsPane = createButtonsPane();
+
+        setCaseListContent(caseList);
 
         topLayout.getChildren().addAll(searchField);
         buttonsPane.getChildren().addAll(editCaseBtn, deleteCaseBtn);
         centerLayout.add(caseList, 0, 0, 1, 2);
         centerLayout.add(selectedCasePane, 1, 0);
         centerLayout.add(buttonsPane, 1, 1);
+
         this.setTop(topLayout);
         this.setLeft(leftLayout);
         this.setCenter(centerLayout);
@@ -90,17 +92,6 @@ public class MainWindow extends BorderPane {
             caseBoxes.add(new CaseBox(newCase));
         }
         caseBoxList = FXCollections.observableList(caseBoxes);
-    }
-
-    private TextField createSearchField() {
-        TextField textField = new TextField();
-        textField.setPromptText("Søk på hva som helst");
-        textField.textProperty().addListener(observable -> {
-            filteredList = new FilteredList<>(caseBoxList, i ->
-                    i.getNewCase().getFullText().toLowerCase().contains(searchField.getText().toLowerCase()));
-            listView.setItems(filteredList);
-        });
-        return textField;
     }
 
     private Button setCreateCaseBtn() {
@@ -144,6 +135,17 @@ public class MainWindow extends BorderPane {
             }
         });
         return button;
+    }
+
+    private TextField createSearchField() {
+        TextField textField = new TextField();
+        textField.setPromptText("Søk på hva som helst");
+        textField.textProperty().addListener(observable -> {
+            filteredList = new FilteredList<>(caseBoxList, i ->
+                    i.getNewCase().getFullText().toLowerCase().contains(searchField.getText().toLowerCase()));
+            listView.setItems(filteredList);
+        });
+        return textField;
     }
 
     private void deleteCase(Case existingCase) {

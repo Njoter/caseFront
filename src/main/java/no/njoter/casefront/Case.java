@@ -4,6 +4,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import no.njoter.casefront.util.DateFormatter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Case {
@@ -115,6 +116,10 @@ public class Case {
 
     public void setTidspunkt(LocalDateTime tidspunkt) {
         this.tidspunkt = tidspunkt;
+    }
+
+    public LocalDate getTidspunktConvertedToLocalDate() {
+        return LocalDate.from(tidspunkt);
     }
 
     public String getFullText() {

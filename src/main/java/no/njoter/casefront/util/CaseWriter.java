@@ -47,7 +47,6 @@ public class CaseWriter {
             writer.write(newCase.getLøsning() + ";");
             writer.write(newCase.getAnsattNavn() + ";");
             writer.write(newCase.getTidspunkt().toString() + ";");
-            writer.write(newCase.getFullText());
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
